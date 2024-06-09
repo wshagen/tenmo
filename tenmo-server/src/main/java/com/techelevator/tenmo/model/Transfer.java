@@ -1,12 +1,11 @@
 package com.techelevator.tenmo.model;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
-@Entity
+
 public class Transfer {
-    @Id
+
     @NotNull(message = "Transfer Id must not be null.")
     private int transferId;
     @NotNull(message = "Transfer Type Id must not be null.")

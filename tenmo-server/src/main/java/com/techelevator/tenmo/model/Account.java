@@ -1,23 +1,20 @@
 package com.techelevator.tenmo.model;
 
-import javax.persistence.*;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
+import java.math.BigDecimal;
 import java.util.Objects;
 
-@Entity
+
 public class Account {
-    @Id
     @NotNull(message = "Account Id must not be null.")
     private int accountId;
     @NotNull(message = "User Id must not be null.")
-    @Column(name = "user_id")
     private int userId;
     @NotNull(message = "Balance must not be null.")
     @Positive
-    private double balance;
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable=false)
+    private BigDecimal balance;
     private User user;
 
     public int getAccountId() {
@@ -36,17 +33,17 @@ public class Account {
         userId = id;
     }
 
-    public void setBalance(double balance) {
+    public void setBalance(BigDecimal balance) {
         this.balance = balance;
     }
 
-    public double getBalance() {
+    public BigDecimal getBalance() {
         return balance;
     }
 
     public Account() {}
 
-    public Account(int accountId, int userid, double balance) {
+    public Account(int accountId, int userid, BigDecimal balance) {
         this.accountId = accountId;
         this.userId = userid;
         this.balance = balance;

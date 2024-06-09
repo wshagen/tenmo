@@ -1,11 +1,10 @@
 package com.techelevator.tenmo.model;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+
 import javax.validation.constraints.NotNull;
-@Entity
+
 public class TransferStatus {
-    @Id
+
     @NotNull(message = "Transfer Status Id must not be null.")
     private int transferStatusId;
     @NotNull(message = "Transfer Status Desc must not be null.")

@@ -1,19 +1,15 @@
 package com.techelevator.tenmo.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import net.bytebuddy.dynamic.loading.InjectionClassLoader;
+
 
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import javax.persistence.*;
 
-@Entity
-@Table(name = "tenmo_user")
+
 public class User {
-   @Id
-   //@GeneratedValue(Strategy = GenerationType.IDENTITY)
-   @Column(name = "user_id")
+
    private int id;
    private String username;
    @JsonIgnore // prevent from being sent to client
@@ -21,7 +17,6 @@ public class User {
    @JsonIgnore
    private boolean activated;
    private Set<Authority> authorities = new HashSet<>();
-   @OneToMany(mappedBy = "account")
    private Set<Account> accounts;
 
    public User() { }
