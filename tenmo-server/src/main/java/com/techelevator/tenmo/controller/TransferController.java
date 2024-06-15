@@ -6,6 +6,9 @@ import com.techelevator.tenmo.dao.JdbcTransferDao;
 import com.techelevator.tenmo.model.Transfer;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import java.math.BigDecimal;
+
 
 @RestController
 @RequestMapping(path = "")
@@ -22,7 +25,7 @@ public class TransferController {
     }
 
     @PostMapping(path = "/transfer")
-    public Transfer createTransfer(@RequestBody Transfer transfer) {
+    public Transfer createTransfer(@Valid @RequestBody Transfer transfer) {
         return jdbcTransferDao.createTransfer(transfer);
     }
 }

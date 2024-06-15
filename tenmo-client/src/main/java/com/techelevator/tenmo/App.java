@@ -2,10 +2,7 @@ package com.techelevator.tenmo;
 
 import com.techelevator.tenmo.model.AuthenticatedUser;
 import com.techelevator.tenmo.model.UserCredentials;
-import com.techelevator.tenmo.services.AccountService;
-import com.techelevator.tenmo.services.AuthenticationService;
-import com.techelevator.tenmo.services.ConsoleService;
-import com.techelevator.tenmo.services.TransferService;
+import com.techelevator.tenmo.services.*;
 
 public class App {
 
@@ -15,6 +12,7 @@ public class App {
     private final AuthenticationService authenticationService = new AuthenticationService(API_BASE_URL);
     private final AccountService accountService = new AccountService();
     private final TransferService transferService = new TransferService();
+    private final UserService userService = new UserService();
 
     private AuthenticatedUser currentUser;
 
@@ -76,6 +74,16 @@ public class App {
             } else if (menuSelection == 3) {
                 viewPendingRequests();
             } else if (menuSelection == 4) {
+                System.out.println("-------------------------------------------");
+                System.out.println("Users");
+                System.out.println("ID              Name");
+                System.out.println("-------------------------------------------");
+                for(int i = 0; i < userService.getUsers().length; i++) {
+                    System.out.print(userService.getUsers()[i].getId() + "              ");
+                    System.out.println(userService.getUsers()[i].getUsername());
+
+                }
+                System.out.println("-----------");
                 sendBucks();
             } else if (menuSelection == 5) {
                 requestBucks();
@@ -106,7 +114,7 @@ public class App {
 
 	private void sendBucks() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	private void requestBucks() {
