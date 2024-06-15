@@ -31,10 +31,6 @@ public class TransferService {
        return returnedTransfer;
    }
 
-   //public Transfer checkTransfer(int accountFrom, int accountTo) {
-
-  // }
-
    private HttpEntity<Transfer> makeEntity(Transfer transfer) {
        HttpHeaders headers = new HttpHeaders();
        headers.setContentType(MediaType.APPLICATION_JSON);

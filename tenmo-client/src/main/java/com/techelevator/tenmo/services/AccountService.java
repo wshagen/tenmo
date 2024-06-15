@@ -18,4 +18,12 @@ public class AccountService {
                 Account.class);
         return account.getBalance();
     }
+
+    public Account getAccount(int userId) {
+        Account account = restTemplate.getForObject(API_BASE_URL + "/" + userId,
+                Account.class);
+        return account;
+    }
+
+
 }

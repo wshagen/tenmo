@@ -31,6 +31,7 @@ public class Account {
     public void setBalance(BigDecimal balance) {
         this.balance = balance;
     }
+
     public Account(){}
 
     public Account(int accountId, int userId, BigDecimal balance) {

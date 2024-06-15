@@ -1,8 +1,13 @@
 package com.techelevator.tenmo;
 
+import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.AuthenticatedUser;
+import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.model.UserCredentials;
 import com.techelevator.tenmo.services.*;
+import com.techelevator.util.BasicLogger;
+
+import java.math.BigDecimal;
 
 public class App {
 
@@ -15,6 +20,8 @@ public class App {
     private final UserService userService = new UserService();
 
     private AuthenticatedUser currentUser;
+
+    private int idSelection = -1;
 
     public static void main(String[] args) {
         App app = new App();
@@ -84,6 +91,10 @@ public class App {
 
                 }
                 System.out.println("-----------");
+                idSelection = consoleService.promptForInt("Enter ID of user you are sending to (0 to cancel): ");
+                if(currentUser.getUser().getId() == idSelection){
+                    System.out.println("Cannot send money to own account.");
+                }
                 sendBucks();
             } else if (menuSelection == 5) {
                 requestBucks();
@@ -99,7 +110,7 @@ public class App {
 	private void viewCurrentBalance() {
 
         System.out.println("Your current balance is: $" + accountService.getBalance(currentUser.getUser()));
-        System.out.println(currentUser.getToken());
+        //System.out.println(currentUser.getToken());
 	}
 
 	private void viewTransferHistory() {
@@ -113,8 +124,20 @@ public class App {
 	}
 
 	private void sendBucks() {
-		// TODO Auto-generated method stub
-
+        BigDecimal amountToTransfer = consoleService.promptForBigDecimal("Enter amount: ");
+        if(accountService.getBalance(currentUser.getUser()).compareTo(amountToTransfer) < 0){
+            Account accountFrom = accountService.getAccount(currentUser.getUser().getId());
+            Account accountTo = accountService.getAccount(idSelection);
+            Transfer transfer = new Transfer(0, 2,2, accountFrom.getAccountId(), accountTo.getAccountId(), amountToTransfer);
+            try {
+                transferService.createTransfer(transfer);
+                accountFrom.setBalance(accountFrom.getBalance().subtract(amountToTransfer));
+                accountTo.setBalance(accountTo.getBalance().add(amountToTransfer));
+            } catch (Exception e){
+                BasicLogger.log(e.getMessage());
+            }
+        }
+        System.out.println("You Suck!!!");
 	}
 
 	private void requestBucks() {
