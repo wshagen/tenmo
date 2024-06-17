@@ -8,4 +8,6 @@ import java.util.List;
 public interface AccountDao {
 
     Account getAccountByUserId(int userId);
+
+    Account getAccountById(int id);
 }

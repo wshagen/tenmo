@@ -91,11 +91,17 @@ public class App {
 
                 }
                 System.out.println("-----------");
+
                 idSelection = consoleService.promptForInt("Enter ID of user you are sending to (0 to cancel): ");
-                if(currentUser.getUser().getId() == idSelection){
-                    System.out.println("Cannot send money to own account.");
+                while (idSelection != 0) {
+                    if (currentUser.getUser().getId() == idSelection) {
+                        System.out.println("Cannot send money to own account.");
+                        idSelection = 0;
+                    } else {
+                        sendBucks();
+                        idSelection = 0;
+                    }
                 }
-                sendBucks();
             } else if (menuSelection == 5) {
                 requestBucks();
             } else if (menuSelection == 0) {
@@ -109,7 +115,7 @@ public class App {
 
 	private void viewCurrentBalance() {
 
-        System.out.println("Your current balance is: $" + accountService.getBalance(currentUser.getUser()));
+        System.out.println("Your current balance is: $" + accountService.getBalance(currentUser.getToken()));
         //System.out.println(currentUser.getToken());
 	}
 
@@ -125,19 +131,16 @@ public class App {
 
 	private void sendBucks() {
         BigDecimal amountToTransfer = consoleService.promptForBigDecimal("Enter amount: ");
-        if(accountService.getBalance(currentUser.getUser()).compareTo(amountToTransfer) < 0){
-            Account accountFrom = accountService.getAccount(currentUser.getUser().getId());
-            Account accountTo = accountService.getAccount(idSelection);
-            Transfer transfer = new Transfer(0, 2,2, accountFrom.getAccountId(), accountTo.getAccountId(), amountToTransfer);
-            try {
-                transferService.createTransfer(transfer);
-                accountFrom.setBalance(accountFrom.getBalance().subtract(amountToTransfer));
-                accountTo.setBalance(accountTo.getBalance().add(amountToTransfer));
-            } catch (Exception e){
-                BasicLogger.log(e.getMessage());
-            }
+        if (accountService.getBalance(currentUser.getToken()).compareTo(amountToTransfer) > 0){
+            Transfer transfer = new Transfer(
+                currentUser.getUser().getId(),
+                idSelection,
+                amountToTransfer
+            );
+            transferService.createTransfer(transfer, currentUser.getToken());
+        } else {
+            System.out.println("Insufficient funds");
         }
-        System.out.println("You Suck!!!");
 	}
 
 	private void requestBucks() {

@@ -9,7 +9,7 @@ import java.util.Objects;
 
 public class Account {
     @NotNull(message = "Account Id must not be null.")
-    private int accountId;
+    private int id;
     @NotNull(message = "User Id must not be null.")
     private int userId;
     @NotNull(message = "Balance must not be null.")
@@ -17,20 +17,20 @@ public class Account {
     private BigDecimal balance;
     private User user;
 
-    public int getAccountId() {
-        return accountId;
-    }
-
-    public void setAccountId(int accountId) {
-        this.accountId = accountId;
-    }
-
     public int getId() {
-        return userId;
+        return id;
     }
 
     public void setId(int id) {
-        userId = id;
+        this.id = id;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
     public void setBalance(BigDecimal balance) {
@@ -43,14 +43,14 @@ public class Account {
 
     public Account() {}
 
-    public Account(int accountId, int userid, BigDecimal balance) {
-        this.accountId = accountId;
+    public Account(int id, int userid, BigDecimal balance) {
+        this.id = id;
         this.userId = userid;
         this.balance = balance;
     }
     @Override
     public String toString() {
-        return "Account { " + "account_id=" + accountId +
+        return "Account { " + "id=" + id +
                 " , user_id=" + userId +
                 ", balance=" + balance +
                 '}';
@@ -59,7 +59,7 @@ public class Account {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Account account = (Account) o;
-        return accountId == account.accountId &&
+        return id == account.id &&
                 Objects.equals(userId, account.userId) &&
                 Objects.equals(balance, account.balance);
     }
