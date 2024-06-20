@@ -1,19 +1,20 @@
 package com.techelevator.tenmo.model;
 
-
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
 import java.math.BigDecimal;
 
 public class TransferRequest {
-
-    @NotNull(message = "User From must not be null.")
+    private int transferId;
     private int userFrom;
-    @NotNull(message = "User To must not be null.")
     private int userTo;
-    @NotNull(message = "Amount must not be null.")
-    @Positive(message = "Transfer amount must be greater than 0.")
     private BigDecimal amount;
+
+    public int getTransferId() {
+        return transferId;
+    }
+
+    public void setTransferId(int transferId) {
+        this.transferId = transferId;
+    }
 
     public int getUserFrom() {
         return userFrom;
@@ -39,13 +40,17 @@ public class TransferRequest {
         this.amount = amount;
     }
 
-    public TransferRequest() {}
+    public TransferRequest(){}
 
-    @Override
-    public String toString(){
-        return "TransferRequest{user_from=" + userFrom +
-                ", user_to=" + userTo +
-                ", amount=" + amount +
-                "}";
+    public TransferRequest(int userFrom, int userTo, BigDecimal amount) {
+        this.userFrom = userFrom;
+        this.userTo = userTo;
+        this.amount = amount;
+    }
+    public TransferRequest(int transferId, int userFrom, int userTo, BigDecimal amount) {
+        this.transferId = transferId;
+        this.userFrom = userFrom;
+        this.userTo = userTo;
+        this.amount = amount;
     }
 }

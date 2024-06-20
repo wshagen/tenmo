@@ -1,9 +1,6 @@
 package com.techelevator.tenmo;
 
-import com.techelevator.tenmo.model.Account;
-import com.techelevator.tenmo.model.AuthenticatedUser;
-import com.techelevator.tenmo.model.Transfer;
-import com.techelevator.tenmo.model.UserCredentials;
+import com.techelevator.tenmo.model.*;
 import com.techelevator.tenmo.services.*;
 
 import java.math.BigDecimal;
@@ -119,27 +116,33 @@ public class App {
 
 	private void viewTransferHistory() {
 		// TODO Auto-generated method stub
-        Transfer[] transfers = transferService.getTransfers(currentUser.getUser().getId(), currentUser.getToken());
-        Account MY_ACCOUNT = accountService.getAccount(currentUser.getUser().getId(), currentUser.getToken());
+        TransferResponse[] transferResponses = transferService.getTransfers(currentUser.getToken());
+        Account MY_ACCOUNT = accountService.getAccount(currentUser.getToken());
 
-        if (transfers.length != 0){
+        if (transferResponses.length != 0){
             System.out.println("View transfers:");
             System.out.println("-------------------------------------------");
             System.out.println("Transfers");
             System.out.println("ID            From/To                Amount");
             System.out.println("-------------------------------------------");
-            for (Transfer transfer : transfers) {
+            for (TransferResponse transferResponse : transferResponses) {
                 //Transfer mode
                 //1 "Sending"
                 //2 "Receiving"
-                if (transfer.getAccountFrom() == MY_ACCOUNT.getUserId()) { //1    "Sending to others"
-                    System.out.println(transfer.getTransferId() + "          " +
-                            "To:   " + transfer.getAccountTo() + "              $" + transfer.getAmount());
+                if (transferResponse.getUserFrom().equals(currentUser.getUser().getUsername())) { //1    "Sending to others"
+                    System.out.println(transferResponse.getTransferId() + "          " +
+                            "To:   " + transferResponse.getUserTo() + "              $" + transferResponse.getAmount());
                 } else { //2    "Receiving from others"
-                    System.out.println(transfer.getTransferId() + "          " +
-                            "From: " + transfer.getAccountFrom() + "              $" + transfer.getAmount());
+                    System.out.println(transferResponse.getTransferId() + "          " +
+                            "From: " + transferResponse.getUserFrom() + "              $" + transferResponse.getAmount());
 
                 }
+            }
+            int select = -1;
+            while (select != 0) {
+                select = consoleService.promptForInt("Please enter transferRequest ID to view details (0 to cancel):");
+                TransferResponse selection = transferService.getTransfer(select, currentUser.getToken());
+                System.out.println(selection);
             }
         } else {
             System.out.println("List is empty!");
@@ -154,12 +157,12 @@ public class App {
 	private void sendBucks() {
         BigDecimal amountToTransfer = consoleService.promptForBigDecimal("Enter amount: ");
         if (accountService.getBalance(currentUser.getToken()).compareTo(amountToTransfer) > 0){
-            Transfer transfer = new Transfer(
+            TransferRequest transferRequest = new TransferRequest(
                 currentUser.getUser().getId(),
                 idSelection,
                 amountToTransfer
             );
-            transferService.createTransfer(transfer, currentUser.getToken());
+            transferService.createTransfer(transferRequest, currentUser.getToken());
             System.out.println("Success - Transfer completed!");
             System.out.println("Your current balance is: $" + accountService.getBalance(currentUser.getToken()));
         } else {

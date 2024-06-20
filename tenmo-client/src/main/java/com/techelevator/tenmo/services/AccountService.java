@@ -37,17 +37,16 @@ public class AccountService {
         }
     }
 
-    public Account getAccount(int userId, String token) {
+    public Account getAccount(String token) {
         Account account = new Account();
         try{
-            ResponseEntity<Account> response = restTemplate.exchange(API_BASE_URL + "/" + userId,
+            ResponseEntity<Account> response = restTemplate.exchange(API_BASE_URL,
                     HttpMethod.GET,
                     makeAuthEntity(),
                     Account.class);
             account = response.getBody();
         } catch (RestClientResponseException | ResourceAccessException e){
             BasicLogger.log(e.getMessage());
-            account.setUserId(userId);
         }
         return account;
     }

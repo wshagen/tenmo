@@ -5,10 +5,7 @@ package com.techelevator.tenmo.controller;
 import com.techelevator.tenmo.dao.JdbcAccountDao;
 import com.techelevator.tenmo.dao.JdbcTransferDao;
 import com.techelevator.tenmo.dao.JdbcUserDao;
-import com.techelevator.tenmo.model.Account;
-import com.techelevator.tenmo.model.Transfer;
-import com.techelevator.tenmo.model.TransferRequest;
-import com.techelevator.tenmo.model.User;
+import com.techelevator.tenmo.model.*;
 import com.techelevator.tenmo.security.SecurityUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,8 +36,34 @@ public class TransferController {
     }
 
     @GetMapping(path = "/transfer/{Id}")
-    public Transfer getTransferById(@PathVariable int id) {
-        return jdbcTransferDao.getTransferById(id);
+    public ResponseEntity<TransferResponse> getTransferById(@PathVariable int id) {
+        String currentUsername = SecurityUtils.getCurrentUsername();
+        User currentUser = jdbcUserDao.getUserByUsername(currentUsername);
+        Transfer transfer = jdbcTransferDao.getTransferById(id);
+        Account accountFrom = jdbcAccountDao.getAccountById(transfer.getAccountFrom());
+        Account accountTo = jdbcAccountDao.getAccountById(transfer.getAccountTo());
+        if (currentUser.getId() == accountFrom.getUserId() || currentUser.getId() == accountTo.getUserId()) {
+            User userFrom = jdbcUserDao.getUserById(accountFrom.getUserId());
+            User userTo = jdbcUserDao.getUserById(accountTo.getUserId());
+            return new ResponseEntity<>(
+                new TransferResponse(
+                    transfer.getTransferId(),
+                    transfer.getTransferStatusId() == 2
+                        ? "Approved"
+                        : (
+                            transfer.getTransferStatusId() == 1
+                                ? "Pending"
+                                : "Rejected"
+                        ),
+                    userFrom.getUsername(),
+                    userTo.getUsername(),
+                    transfer.getAmount()
+                ),
+                HttpStatus.OK
+            );
+        } else {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
     }
 
     @PostMapping(path = "/transfer")
@@ -68,7 +91,7 @@ public class TransferController {
             } else {
                 return new ResponseEntity<>(HttpStatus.PRECONDITION_FAILED);
             }
-        } else {
+        } else if (currentUser.getId() == accountTo.getUserId()) {
             Transfer transfer = new Transfer();
             transfer.setTransferTypeId(1);
             transfer.setTransferStatusId(1);
@@ -77,10 +100,15 @@ public class TransferController {
             transfer.setAmount(transferRequest.getAmount());
             jdbcTransferDao.createTransfer(transfer);
             return new ResponseEntity<>(HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
     }
-    @GetMapping(path = "/transfer_list/{id}")
-    public List<Transfer> getTransfers(@PathVariable int id){
-        return jdbcTransferDao.getTransferList(id);
+
+    @GetMapping(path = "/transfers/completed")
+    public List<TransferResponse> getTransfers(){
+        String currentUsername = SecurityUtils.getCurrentUsername();
+        User currentUser = jdbcUserDao.getUserByUsername(currentUsername);
+        return jdbcTransferDao.getTransferList(currentUser.getId(), 2);
     }
 }
