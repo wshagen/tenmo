@@ -2,6 +2,7 @@ package com.techelevator.tenmo.services;
 
 import com.techelevator.tenmo.model.User;
 import com.techelevator.util.BasicLogger;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;

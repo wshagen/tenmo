@@ -1,15 +1,13 @@
 package com.techelevator.tenmo.services;
 
 import com.techelevator.tenmo.model.Account;
-import com.techelevator.tenmo.model.AuthenticatedUser;
-import com.techelevator.tenmo.model.Transfer;
-import com.techelevator.tenmo.model.User;
 import com.techelevator.util.BasicLogger;
 import org.springframework.http.*;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 public class AccountService {
 
@@ -39,10 +37,19 @@ public class AccountService {
         }
     }
 
-    public Account getAccount(int userId) {
-
-        return restTemplate.getForObject(API_BASE_URL + "/" + userId,
-                Account.class);
+    public Account getAccount(int userId, String token) {
+        Account account = new Account();
+        try{
+            ResponseEntity<Account> response = restTemplate.exchange(API_BASE_URL + "/" + userId,
+                    HttpMethod.GET,
+                    makeAuthEntity(),
+                    Account.class);
+            account = response.getBody();
+        } catch (RestClientResponseException | ResourceAccessException e){
+            BasicLogger.log(e.getMessage());
+            account.setUserId(userId);
+        }
+        return account;
     }
 
     private HttpEntity<Void> makeAuthEntity() {

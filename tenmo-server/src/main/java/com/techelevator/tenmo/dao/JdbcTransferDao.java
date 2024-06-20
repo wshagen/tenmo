@@ -58,13 +58,13 @@ public class JdbcTransferDao implements TransferDao {
 
     public List<Transfer> getTransferList(int id){
         List<Transfer> transfers = new ArrayList<>();
-        String sql = "SELECT transfer_id, transfer_type_id, transfer_status_id,\n" +
-                "account_from, account_to, amount \n" +
+        String sql = "SELECT transfer_id, transfer_type_id, transfer_status_id," +
+                "account_from, account_to, amount " +
                 "FROM transfer WHERE (transfer_status_id = 2 AND account_from IN " +
                 "(SELECT account_id FROM account WHERE user_id = ?)) " +
                 "UNION " +
-                "SELECT transfer_id, transfer_type_id, transfer_status_id, \n" +
-                "account_from, account_to, amount \n" +
+                "SELECT transfer_id, transfer_type_id, transfer_status_id, " +
+                "account_from, account_to, amount " +
                 "FROM transfer WHERE (transfer_status_id = 2 AND account_to IN " +
                 "(SELECT account_id FROM account WHERE user_id = ?));";
         try{

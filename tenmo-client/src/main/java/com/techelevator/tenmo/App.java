@@ -120,7 +120,7 @@ public class App {
 	private void viewTransferHistory() {
 		// TODO Auto-generated method stub
         Transfer[] transfers = transferService.getTransfers(currentUser.getUser().getId(), currentUser.getToken());
-        Account MY_ACCOUNT = accountService.getAccount(currentUser.getUser().getId());
+        Account MY_ACCOUNT = accountService.getAccount(currentUser.getUser().getId(), currentUser.getToken());
 
         if (transfers.length != 0){
             System.out.println("View transfers:");
@@ -132,7 +132,7 @@ public class App {
                 //Transfer mode
                 //1 "Sending"
                 //2 "Receiving"
-                if (transfer.getAccountFrom() == MY_ACCOUNT.getAccountId()) { //1    "Sending to others"
+                if (transfer.getAccountFrom() == MY_ACCOUNT.getUserId()) { //1    "Sending to others"
                     System.out.println(transfer.getTransferId() + "          " +
                             "To:   " + transfer.getAccountTo() + "              $" + transfer.getAmount());
                 } else { //2    "Receiving from others"

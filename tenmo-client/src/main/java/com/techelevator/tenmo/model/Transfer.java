@@ -40,6 +40,8 @@ public class Transfer {
         this.amount = amount;
     }
 
+    public Transfer(){}
+
     public Transfer(int accountFrom, int accountTo, BigDecimal amount) {
         this.accountFrom = accountFrom;
         this.accountTo = accountTo;
