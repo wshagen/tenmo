@@ -4,8 +4,8 @@ import java.math.BigDecimal;
 
 public class Transfer {
     private int transferId;
-    private int userFrom;
-    private int userTo;
+    private int accountFrom;
+    private int accountTo;
     private BigDecimal amount;
 
     public int getTransferId() {
@@ -16,20 +16,20 @@ public class Transfer {
         this.transferId = transferId;
     }
 
-    public int getUserFrom() {
-        return userFrom;
+    public int getAccountFrom() {
+        return accountFrom;
     }
 
-    public void setUserFrom(int userFrom) {
-        this.userFrom = userFrom;
+    public void setAccountFrom(int accountFrom) {
+        this.accountFrom = accountFrom;
     }
 
-    public int getUserTo() {
-        return userTo;
+    public int getAccountTo() {
+        return accountTo;
     }
 
-    public void setUserTo(int userTo) {
-        this.userTo = userTo;
+    public void setAccountTo(int accountTo) {
+        this.accountTo = accountTo;
     }
 
     public BigDecimal getAmount() {
@@ -40,15 +40,15 @@ public class Transfer {
         this.amount = amount;
     }
 
-    public Transfer(int userFrom, int userTo, BigDecimal amount) {
-        this.userFrom = userFrom;
-        this.userTo = userTo;
+    public Transfer(int accountFrom, int accountTo, BigDecimal amount) {
+        this.accountFrom = accountFrom;
+        this.accountTo = accountTo;
         this.amount = amount;
     }
-    public Transfer(int transferId, int userFrom, int userTo, BigDecimal amount) {
+    public Transfer(int transferId, int accountFrom, int accountTo, BigDecimal amount) {
         this.transferId = transferId;
-        this.userFrom = userFrom;
-        this.userTo = userTo;
+        this.accountFrom = accountFrom;
+        this.accountTo = accountTo;
         this.amount = amount;
     }
 }

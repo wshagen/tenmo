@@ -5,7 +5,6 @@ import com.techelevator.tenmo.model.AuthenticatedUser;
 import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.model.UserCredentials;
 import com.techelevator.tenmo.services.*;
-import com.techelevator.util.BasicLogger;
 
 import java.math.BigDecimal;
 
@@ -116,12 +115,35 @@ public class App {
 	private void viewCurrentBalance() {
 
         System.out.println("Your current balance is: $" + accountService.getBalance(currentUser.getToken()));
-        //System.out.println(currentUser.getToken());
 	}
 
 	private void viewTransferHistory() {
 		// TODO Auto-generated method stub
-		
+        Transfer[] transfers = transferService.getTransfers(currentUser.getUser().getId(), currentUser.getToken());
+        Account MY_ACCOUNT = accountService.getAccount(currentUser.getUser().getId());
+
+        if (transfers.length != 0){
+            System.out.println("View transfers:");
+            System.out.println("-------------------------------------------");
+            System.out.println("Transfers");
+            System.out.println("ID            From/To                Amount");
+            System.out.println("-------------------------------------------");
+            for (Transfer transfer : transfers) {
+                //Transfer mode
+                //1 "Sending"
+                //2 "Receiving"
+                if (transfer.getAccountFrom() == MY_ACCOUNT.getAccountId()) { //1    "Sending to others"
+                    System.out.println(transfer.getTransferId() + "          " +
+                            "To:   " + transfer.getAccountTo() + "              $" + transfer.getAmount());
+                } else { //2    "Receiving from others"
+                    System.out.println(transfer.getTransferId() + "          " +
+                            "From: " + transfer.getAccountFrom() + "              $" + transfer.getAmount());
+
+                }
+            }
+        } else {
+            System.out.println("List is empty!");
+        }
 	}
 
 	private void viewPendingRequests() {
@@ -138,6 +160,8 @@ public class App {
                 amountToTransfer
             );
             transferService.createTransfer(transfer, currentUser.getToken());
+            System.out.println("Success - Transfer completed!");
+            System.out.println("Your current balance is: $" + accountService.getBalance(currentUser.getToken()));
         } else {
             System.out.println("Insufficient funds");
         }

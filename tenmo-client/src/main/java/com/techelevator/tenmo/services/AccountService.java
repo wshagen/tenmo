@@ -2,6 +2,7 @@ package com.techelevator.tenmo.services;
 
 import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.AuthenticatedUser;
+import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.model.User;
 import com.techelevator.util.BasicLogger;
 import org.springframework.http.*;
@@ -15,6 +16,11 @@ public class AccountService {
     public static String API_BASE_URL = "http://localhost:8080/account";
     private final RestTemplate restTemplate = new RestTemplate();
 
+    private String authToken = null;
+
+    public void setAuthToken(String authToken) {
+        this.authToken = authToken;
+    }
 
     public BigDecimal getBalance(String token){
         HttpHeaders httpHeaders = new HttpHeaders();
@@ -34,9 +40,14 @@ public class AccountService {
     }
 
     public Account getAccount(int userId) {
+
         return restTemplate.getForObject(API_BASE_URL + "/" + userId,
                 Account.class);
     }
 
-
+    private HttpEntity<Void> makeAuthEntity() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(authToken);
+        return new HttpEntity<>(headers);
+    }
 }

@@ -9,6 +9,9 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 
 import javax.swing.tree.TreeNode;
+import java.util.ArrayList;
+import java.util.List;
+
 @Component
 public class JdbcTransferDao implements TransferDao {
 
@@ -52,6 +55,30 @@ public class JdbcTransferDao implements TransferDao {
         }
         return newTransfer;
     }
+
+    public List<Transfer> getTransferList(int id){
+        List<Transfer> transfers = new ArrayList<>();
+        String sql = "SELECT transfer_id, transfer_type_id, transfer_status_id,\n" +
+                "account_from, account_to, amount \n" +
+                "FROM transfer WHERE (transfer_status_id = 2 AND account_from IN " +
+                "(SELECT account_id FROM account WHERE user_id = ?)) " +
+                "UNION " +
+                "SELECT transfer_id, transfer_type_id, transfer_status_id, \n" +
+                "account_from, account_to, amount \n" +
+                "FROM transfer WHERE (transfer_status_id = 2 AND account_to IN " +
+                "(SELECT account_id FROM account WHERE user_id = ?));";
+        try{
+            SqlRowSet results = jdbcTemplate.queryForRowSet(sql, id, id);
+            while (results.next()){
+                Transfer transfer = mapRowToTransfer(results);
+                transfers.add(transfer);
+            }
+        } catch (CannotGetJdbcConnectionException e){
+            throw new DaoException("Unable to server or database", e);
+        }
+        return transfers;
+    }
+
     private Transfer mapRowToTransfer(SqlRowSet rs) {
         Transfer transfer = new Transfer();
         transfer.setTransferId(rs.getInt("transfer_id"));

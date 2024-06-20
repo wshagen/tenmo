@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.math.BigDecimal;
+import java.util.List;
 
 
 @RestController
@@ -77,5 +78,9 @@ public class TransferController {
             jdbcTransferDao.createTransfer(transfer);
             return new ResponseEntity<>(HttpStatus.OK);
         }
+    }
+    @GetMapping(path = "/transfer_list/{id}")
+    public List<Transfer> getTransfers(@PathVariable int id){
+        return jdbcTransferDao.getTransferList(id);
     }
 }
