@@ -14,11 +14,6 @@ public class AccountService {
     public static String API_BASE_URL = "http://localhost:8080/account";
     private final RestTemplate restTemplate = new RestTemplate();
 
-    private String authToken = null;
-
-    public void setAuthToken(String authToken) {
-        this.authToken = authToken;
-    }
 
     public BigDecimal getBalance(String token){
         HttpHeaders httpHeaders = new HttpHeaders();
@@ -37,12 +32,12 @@ public class AccountService {
         }
     }
 
-    public Account getAccount(String token) {
+    public Account getAccount(String authToken) {
         Account account = new Account();
         try{
             ResponseEntity<Account> response = restTemplate.exchange(API_BASE_URL,
                     HttpMethod.GET,
-                    makeAuthEntity(),
+                    makeAuthEntity(authToken),
                     Account.class);
             account = response.getBody();
         } catch (RestClientResponseException | ResourceAccessException e){
@@ -51,7 +46,7 @@ public class AccountService {
         return account;
     }
 
-    private HttpEntity<Void> makeAuthEntity() {
+    private HttpEntity<Void> makeAuthEntity(String authToken) {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(authToken);
         return new HttpEntity<>(headers);

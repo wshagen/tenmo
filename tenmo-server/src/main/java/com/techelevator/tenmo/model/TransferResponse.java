@@ -12,6 +12,8 @@ public class TransferResponse {
     private int transferId;
     @NotNull
     private String status;
+    @NotNull
+    private String type;
     @NotNull(message = "User From must not be null.")
     private String userFrom;
     @NotNull(message = "User To must not be null.")
@@ -35,6 +37,14 @@ public class TransferResponse {
 
     public void setStatus(@NotNull String status) {
         this.status = status;
+    }
+
+    public @NotNull String getType() {
+        return type;
+    }
+
+    public void setType(@NotNull String type) {
+        this.type = type;
     }
 
     public String getUserFrom() {
@@ -63,9 +73,10 @@ public class TransferResponse {
 
     public TransferResponse() {}
 
-    public TransferResponse(int transferId, String status, String userFrom, String userTo, BigDecimal amount) {
+    public TransferResponse(int transferId, String status, String type, String userFrom, String userTo, BigDecimal amount) {
         this.transferId = transferId;
         this.status = status;
+        this.type = type;
         this.userFrom = userFrom;
         this.userTo = userTo;
         this.amount = amount;

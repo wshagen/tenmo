@@ -32,7 +32,7 @@ public class TransferService {
    }
 
    public TransferResponse getTransfer(int id, String authToken) {
-       TransferResponse transferResponse = null;
+       TransferResponse transferResponse = new TransferResponse();
        try{
            ResponseEntity<TransferResponse> response = restTemplate.exchange(API_BASE_URL + "/" + id,
                HttpMethod.GET,

@@ -59,21 +59,36 @@ public class JdbcTransferDao implements TransferDao {
     @Override
     public List<TransferResponse> getTransferList(int userId, int statusId){
         List<TransferResponse> transfers = new ArrayList<>();
-        String sql = "SELECT t.transfer_id, ts.transfer_status_desc AS status, fu.username AS user_from, tu.username AS user_to, t.amount\n" +
+        String sql = "SELECT t.transfer_id,\n" +
+            "    ts.transfer_status_desc AS status,\n" +
+            "    tt.transfer_type_desc AS type,\n" +
+            "    fu.username AS user_from,\n" +
+            "    tu.username AS user_to,\n" +
+            "    t.amount\n" +
             "FROM transfer t\n" +
             "JOIN transfer_status ts ON (ts.transfer_status_id = t.transfer_status_id)" +
+            "JOIN transfer_type tt ON (tt.transfer_type_id = t.transfer_type_id)" +
             "JOIN account fa ON (fa.account_id = t.account_from)\n" +
             "JOIN tenmo_user fu ON (fu.user_id = fa.user_id)\n" +
             "JOIN account ta ON (ta.account_id = t.account_to)\n" +
             "JOIN tenmo_user tu ON (tu.user_id = ta.user_id)\n" +
-            "WHERE t.transfer_status_id = ? AND (fu.user_id = ? OR tu.user_id = ?)";
-        try{
-            SqlRowSet results = jdbcTemplate.queryForRowSet(sql, statusId, userId, userId);
+            "WHERE t.transfer_status_id = ?\n" +
+            (statusId == 1
+                ? "  AND tu.user_id = ?"
+                : "  AND (fu.user_id = ? OR tu.user_id = ?)");
+        try {
+            SqlRowSet results;
+            if (statusId == 1) {
+                results = jdbcTemplate.queryForRowSet(sql, statusId, userId);
+            } else {
+                results = jdbcTemplate.queryForRowSet(sql, statusId, userId, userId);
+            }
             while (results.next()){
                 transfers.add(
                     new TransferResponse(
                         results.getInt("transfer_id"),
                         results.getString("status"),
+                        results.getString("type"),
                         results.getString("user_from"),
                         results.getString("user_to"),
                         results.getBigDecimal("amount")

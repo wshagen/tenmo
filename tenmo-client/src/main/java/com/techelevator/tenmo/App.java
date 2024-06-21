@@ -77,16 +77,7 @@ public class App {
             } else if (menuSelection == 3) {
                 viewPendingRequests();
             } else if (menuSelection == 4) {
-                System.out.println("-------------------------------------------");
-                System.out.println("Users");
-                System.out.println("ID              Name");
-                System.out.println("-------------------------------------------");
-                for(int i = 0; i < userService.getUsers().length; i++) {
-                    System.out.print(userService.getUsers()[i].getId() + "              ");
-                    System.out.println(userService.getUsers()[i].getUsername());
-
-                }
-                System.out.println("-----------");
+                listUsers();
 
                 idSelection = consoleService.promptForInt("Enter ID of user you are sending to (0 to cancel): ");
                 while (idSelection != 0) {
@@ -99,7 +90,17 @@ public class App {
                     }
                 }
             } else if (menuSelection == 5) {
-                requestBucks();
+                listUsers();
+                idSelection = consoleService.promptForInt("Enter ID of user you are requesting from (0 to cancel): ");
+                while (idSelection != 0) {
+                    if (currentUser.getUser().getId() == idSelection) {
+                        System.out.println("Cannot request money from own account.");
+                        idSelection = 0;
+                    } else {
+                        requestBucks();
+                        idSelection = 0;
+                    }
+                }
             } else if (menuSelection == 0) {
                 continue;
             } else {
@@ -109,7 +110,20 @@ public class App {
         }
     }
 
-	private void viewCurrentBalance() {
+    private void listUsers() {
+        System.out.println("-------------------------------------------");
+        System.out.println("Users");
+        System.out.println("ID              Name");
+        System.out.println("-------------------------------------------");
+        for(int i = 0; i < userService.getUsers().length; i++) {
+            System.out.print(userService.getUsers()[i].getId() + "              ");
+            System.out.println(userService.getUsers()[i].getUsername());
+
+        }
+        System.out.println("-----------");
+    }
+
+    private void viewCurrentBalance() {
 
         System.out.println("Your current balance is: $" + accountService.getBalance(currentUser.getToken()));
 	}
@@ -117,7 +131,6 @@ public class App {
 	private void viewTransferHistory() {
 		// TODO Auto-generated method stub
         TransferResponse[] transferResponses = transferService.getTransfers(currentUser.getToken());
-        Account MY_ACCOUNT = accountService.getAccount(currentUser.getToken());
 
         if (transferResponses.length != 0){
             System.out.println("View transfers:");
@@ -142,7 +155,23 @@ public class App {
             while (select != 0) {
                 select = consoleService.promptForInt("Please enter transferRequest ID to view details (0 to cancel):");
                 TransferResponse selection = transferService.getTransfer(select, currentUser.getToken());
-                System.out.println(selection);
+                System.out.printf("\n" +
+                    "--------------------------------------------\n" +
+                    "Transfer Details\n" +
+                    "--------------------------------------------\n" +
+                    " Id: %d\n" +
+                    " From: %s\n" +
+                    " To: %s\n" +
+                    " Type: %s\n" +
+                    " Status: %s\n" +
+                    " Amount: $%.2f\n\n",
+                    selection.getTransferId(),
+                    selection.getUserFrom(),
+                    selection.getUserTo(),
+                    selection.getType(),
+                    selection.getStatus(),
+                    selection.getAmount()
+                );
             }
         } else {
             System.out.println("List is empty!");
@@ -171,8 +200,15 @@ public class App {
 	}
 
 	private void requestBucks() {
-		// TODO Auto-generated method stub
-		
-	}
+        BigDecimal amountToTransfer = consoleService.promptForBigDecimal("Enter amount: ");
+        TransferRequest transferRequest = new TransferRequest(
+            idSelection,
+            currentUser.getUser().getId(),
+            amountToTransfer
+        );
+        transferService.createTransfer(transferRequest, currentUser.getToken());
+        System.out.println("Success - Transfer Pending");
+
+    }
 
 }

@@ -35,7 +35,7 @@ public class TransferController {
         this.jdbcAccountDao = jdbcAccountDao;
     }
 
-    @GetMapping(path = "/transfer/{Id}")
+    @GetMapping(path = "/transfer/{id}")
     public ResponseEntity<TransferResponse> getTransferById(@PathVariable int id) {
         String currentUsername = SecurityUtils.getCurrentUsername();
         User currentUser = jdbcUserDao.getUserByUsername(currentUsername);
@@ -55,6 +55,7 @@ public class TransferController {
                                 ? "Pending"
                                 : "Rejected"
                         ),
+                    transfer.getTransferTypeId() == 2 ? "Send" : "Request",
                     userFrom.getUsername(),
                     userTo.getUsername(),
                     transfer.getAmount()
@@ -68,6 +69,9 @@ public class TransferController {
 
     @PostMapping(path = "/transfer")
     public ResponseEntity<Void> createTransfer(@Valid @RequestBody TransferRequest transferRequest) {
+        if (transferRequest.getUserFrom() == transferRequest.getUserTo()) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
         String currentUsername = SecurityUtils.getCurrentUsername();
         User currentUser = jdbcUserDao.getUserByUsername(currentUsername);
         Account accountFrom = jdbcAccountDao.getAccountByUserId(transferRequest.getUserFrom());
@@ -106,9 +110,16 @@ public class TransferController {
     }
 
     @GetMapping(path = "/transfers/completed")
-    public List<TransferResponse> getTransfers(){
+    public List<TransferResponse> getCompletedTransfers(){
         String currentUsername = SecurityUtils.getCurrentUsername();
         User currentUser = jdbcUserDao.getUserByUsername(currentUsername);
         return jdbcTransferDao.getTransferList(currentUser.getId(), 2);
+    }
+
+    @GetMapping(path = "/transfers/pending")
+    public List<TransferResponse> getPendingTransfers(){
+        String currentUsername = SecurityUtils.getCurrentUsername();
+        User currentUser = jdbcUserDao.getUserByUsername(currentUsername);
+        return jdbcTransferDao.getTransferList(currentUser.getId(), 1);
     }
 }
