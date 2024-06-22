@@ -9,8 +9,6 @@ import com.techelevator.tenmo.model.*;
 import com.techelevator.tenmo.security.SecurityUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -109,7 +107,38 @@ public class TransferController {
         }
     }
 
-    @GetMapping(path = "/transfers/completed")
+    @PutMapping(path = "/transfer/{id}/approve")
+    public ResponseEntity<Void> approve(@Valid @PathVariable int id) {
+        String currentUsername = SecurityUtils.getCurrentUsername();
+        User currentUser = jdbcUserDao.getUserByUsername(currentUsername);
+        Transfer transfer = jdbcTransferDao.getTransferById(id);
+        Account accountTo = jdbcAccountDao.getAccountById(transfer.getAccountTo());
+        Account accountFrom = jdbcAccountDao.getAccountById(transfer.getAccountFrom());
+        if(accountFrom.getUserId() != currentUser.getId()) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        BigDecimal amountToTransfer = transfer.getAmount();
+        if(accountFrom.getBalance().compareTo(amountToTransfer) >= 0) {
+            jdbcTransferDao.updateStatus(id, 2);
+            BigDecimal newFromBalance = accountFrom.getBalance().subtract(amountToTransfer);
+            jdbcAccountDao.updateBalance(transfer.getAccountFrom(), newFromBalance);
+            BigDecimal newToBalance = accountTo.getBalance().add(amountToTransfer);
+            jdbcAccountDao.updateBalance(transfer.getAccountTo(), newToBalance);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.PRECONDITION_FAILED);
+        }
+    }
+
+    @PutMapping(path = "/transfer/{id}/rejected")
+    public ResponseEntity<Void> reject(@Valid @PathVariable int id) {
+        Transfer transfer = jdbcTransferDao.getTransferById(id);
+        transfer.setTransferStatusId(3);
+        jdbcTransferDao.updateStatus(id, 3);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/transfers/requests")
     public List<TransferResponse> getCompletedTransfers(){
         String currentUsername = SecurityUtils.getCurrentUsername();
         User currentUser = jdbcUserDao.getUserByUsername(currentUsername);

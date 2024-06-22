@@ -18,7 +18,7 @@ public class TransferService {
 
    public void createTransfer(TransferRequest transferRequest, String authToken) {
        HttpEntity<?> entity = makeEntity(transferRequest, authToken);
-       try{
+       try {
            restTemplate.postForObject(
                API_BASE_URL,
                entity,
@@ -30,6 +30,43 @@ public class TransferService {
            BasicLogger.log(e.getMessage());
        }
    }
+
+   public void approveTransfer(int id, String authToken) {
+       HttpHeaders headers = new HttpHeaders();
+       headers.setContentType(MediaType.APPLICATION_JSON);
+       headers.setBearerAuth(authToken);
+       HttpEntity<?> ret = new HttpEntity<>(headers);
+       try {
+           ResponseEntity<Void> response = restTemplate.exchange(
+               API_BASE_URL + "/" + id + "/approve",
+               HttpMethod.PUT,
+               ret,
+               Void.class
+           );
+       } catch(RestClientResponseException e){
+           BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());
+       } catch(ResourceAccessException e) {
+           BasicLogger.log(e.getMessage());
+       }
+   }
+    public void rejectTransfer(int id, String authToken) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(authToken);
+        HttpEntity<?> ret = new HttpEntity<>(headers);
+        try {
+            ResponseEntity<Void> response = restTemplate.exchange(
+                API_BASE_URL + "/" + "/rejected",
+                HttpMethod.PUT,
+                ret,
+                Void.class
+            );
+        } catch(RestClientResponseException e){
+            BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());
+        } catch(ResourceAccessException e) {
+            BasicLogger.log(e.getMessage());
+        }
+    }
 
    public TransferResponse getTransfer(int id, String authToken) {
        TransferResponse transferResponse = new TransferResponse();
@@ -45,10 +82,10 @@ public class TransferService {
        return transferResponse;
    }
 
-   public TransferResponse[] getTransfers(String authToken){
+   public TransferResponse[] getTransferRequests(String authToken){
        TransferResponse[] transferResponses = null;
        try{
-           ResponseEntity<TransferResponse[]> response = restTemplate.exchange(API_BASE_URL + "s/completed",
+           ResponseEntity<TransferResponse[]> response = restTemplate.exchange(API_BASE_URL + "s/requests",
                    HttpMethod.GET,
                    makeAuthEntity(authToken),
                    TransferResponse[].class);
@@ -58,6 +95,20 @@ public class TransferService {
        }
        return transferResponses;
    }
+
+    public TransferResponse[] getPendingTransfers(String authToken){
+        TransferResponse[] transferResponses = null;
+        try{
+            ResponseEntity<TransferResponse[]> response = restTemplate.exchange(API_BASE_URL + "s/pending",
+                HttpMethod.GET,
+                makeAuthEntity(authToken),
+                TransferResponse[].class);
+            transferResponses = response.getBody();
+        } catch (RestClientResponseException | ResourceAccessException e) {
+            BasicLogger.log(e.getMessage());
+        }
+        return transferResponses;
+    }
 
    private HttpEntity<TransferRequest> makeEntity(TransferRequest transferRequest, String authToken) {
        HttpHeaders headers = new HttpHeaders();

@@ -9,7 +9,9 @@ public interface TransferDao {
 
     Transfer getTransferById(int transferId);
 
-    Transfer createTransfer(Transfer transfer);
+    void createTransfer(Transfer transfer);
 
     List<TransferResponse> getTransferList(int userId, int statusId);
+
+    void updateStatus(int id, int statusId);
 }
