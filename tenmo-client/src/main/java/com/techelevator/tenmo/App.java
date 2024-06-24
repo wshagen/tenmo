@@ -116,9 +116,9 @@ public class App {
         System.out.println("Users");
         System.out.println("ID              Name");
         System.out.println("-------------------------------------------");
-        for (int i = 0; i < userService.getUsers().length; i++) {
-            System.out.print(userService.getUsers()[i].getId() + "              ");
-            System.out.println(userService.getUsers()[i].getUsername());
+        for (int i = 0; i < userService.getUsers(currentUser.getToken()).length; i++) {
+            System.out.print(userService.getUsers(currentUser.getToken())[i].getId() + "              ");
+            System.out.println(userService.getUsers(currentUser.getToken())[i].getUsername());
 
         }
         System.out.println("-----------");
